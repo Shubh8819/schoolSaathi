@@ -1,0 +1,62 @@
+/* Sidebar */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    background: #1a1a2e;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #16213e;
+    border-bottom: 1px solid #0f3460;
+}
+
+#sidebar .sidebar-header h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+#sidebar ul li a {
+    padding: 12px 20px;
+    display: block;
+    color: #adb5bd;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-radius: 0;
+}
+
+#sidebar ul li a:hover,
+#sidebar ul li.active > a {
+    color: #fff;
+    background: #0f3460;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    width: 100%;
+}
+
+#content {
+    width: 100%;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+}
+
+/* Table */
+.table th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}

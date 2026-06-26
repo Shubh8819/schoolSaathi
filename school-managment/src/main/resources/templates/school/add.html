@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Add School</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+        <div>
+            <h4 class="mb-1 fw-bold">Add New School</h4>
+            <p class="text-muted mb-0">
+                Register a new school
+            </p>
+        </div>
+        <a th:href="@{/web/schools}"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>
+            Back
+        </a>
+    </div>
+
+    <!-- Form -->
+    <form th:action="@{/web/schools/add}"
+          th:object="${schoolDto}"
+          method="post">
+
+        <!-- Basic Info -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-building me-2"></i>
+                Basic Information
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            School Name *
+                        </label>
+                        <input type="text"
+                               th:field="*{name}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                               placeholder="Sunrise Public School">
+                        <div class="invalid-feedback"
+                             th:errors="*{name}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Tagline
+                        </label>
+                        <input type="text"
+                               th:field="*{tagline}"
+                               class="form-control"
+                               placeholder="Excellence in Education">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Email *
+                        </label>
+                        <input type="email"
+                               th:field="*{email}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                               placeholder="school@example.com">
+                        <div class="invalid-feedback"
+                             th:errors="*{email}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Phone *
+                        </label>
+                        <input type="text"
+                               th:field="*{phone}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'"
+                               placeholder="9876543210">
+                        <div class="invalid-feedback"
+                             th:errors="*{phone}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Board Type *
+                        </label>
+                        <select th:field="*{boardType}"
+                                class="form-select"
+                                th:classappend="${#fields.hasErrors('boardType')} ? 'is-invalid'">
+                            <option value="">
+                                Select Board
+                            </option>
+                            <option th:each="board : ${boardTypes}"
+                                    th:value="${board}"
+                                    th:text="${board}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback"
+                             th:errors="*{boardType}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            School Type *
+                        </label>
+                        <label>
+                            <select th:field="*{schoolType}"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('schoolType')} ? 'is-invalid'">
+                                <option value="">
+                                    Select Type
+                                </option>
+                                <option th:each="type : ${schoolTypes}"
+                                        th:value="${type}"
+                                        th:text="${type}">
+                                </option>
+                            </select>
+                        </label>
+                        <div class="invalid-feedback"
+                             th:errors="*{schoolType}">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-geo-alt me-2"></i>
+                Address
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Address Line 1 *
+                        </label>
+                        <input type="text"
+                               th:field="*{addressLine1}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('addressLine1')} ? 'is-invalid'"
+                               placeholder="Street address">
+                        <div class="invalid-feedback"
+                             th:errors="*{addressLine1}">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            Address Line 2
+                        </label>
+                        <input type="text"
+                               th:field="*{addressLine2}"
+                               class="form-control"
+                               placeholder="Area, Landmark">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            City *
+                        </label>
+                        <input type="text"
+                               th:field="*{city}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('city')} ? 'is-invalid'"
+                               placeholder="Ahmedabad">
+                        <div class="invalid-feedback"
+                             th:errors="*{city}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            State *
+                        </label>
+                        <input type="text"
+                               th:field="*{state}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('state')} ? 'is-invalid'"
+                               placeholder="Gujarat">
+                        <div class="invalid-feedback"
+                             th:errors="*{state}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Pincode *
+                        </label>
+                        <input type="text"
+                               th:field="*{pincode}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('pincode')} ? 'is-invalid'"
+                               placeholder="380001">
+                        <div class="invalid-feedback"
+                             th:errors="*{pincode}">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Principal Info -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-person-badge me-2"></i>
+                Principal Information
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Principal Name *
+                        </label>
+                        <label>
+                            <input type="text"
+                                   th:field="*{principalName}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('principalName')} ? 'is-invalid'"
+                                   placeholder="Dr. Ramesh Kumar">
+                        </label>
+                        <div class="invalid-feedback"
+                             th:errors="*{principalName}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Principal Phone
+                        </label>
+                        <label>
+                            <input type="text"
+                                   th:field="*{principalPhone}"
+                                   class="form-control"
+                                   placeholder="9876543210">
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Account -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-shield-lock me-2"></i>
+                Admin Account
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Admin Name *
+                        </label>
+                        <label>
+                            <input type="text"
+                                   th:field="*{adminName}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'"
+                                   placeholder="Admin Name">
+                        </label>
+                        <div class="invalid-feedback"
+                             th:errors="*{adminName}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Admin Email *
+                        </label>
+                        <label>
+                            <input type="email"
+                                   th:field="*{adminEmail}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('adminEmail')} ? 'is-invalid'"
+                                   placeholder="admin@school.com">
+                        </label>
+                        <div class="invalid-feedback"
+                             th:errors="*{adminEmail}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Password *
+                        </label>
+                        <label>
+                            <input type="password"
+                                   th:field="*{adminPassword}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('adminPassword')} ? 'is-invalid'"
+                                   placeholder="Min 8 characters">
+                        </label>
+                        <div class="invalid-feedback"
+                             th:errors="*{adminPassword}">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit"
+                    class="btn btn-primary px-4">
+                <i class="bi bi-check-circle me-2"></i>
+                Register School
+            </button>
+            <a th:href="@{/web/schools}"
+               class="btn btn-outline-secondary px-4">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

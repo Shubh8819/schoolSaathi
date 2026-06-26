@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<nav id="sidebar" th:fragment="sidebar">
+
+    <div class="sidebar-header">
+        <h3>
+            <i class="bi bi-mortarboard-fill me-2"></i>
+            SchoolSaathi
+        </h3>
+    </div>
+
+    <ul class="list-unstyled components">
+
+        <!-- Dashboard -->
+        <li th:classappend="${activePage == 'dashboard'} ? 'active'">
+            <a th:href="@{/web/dashboard}">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <!-- Schools — Super Admin Only -->
+        <li th:classappend="${activePage == 'schools'} ? 'active'">
+            <a th:href="@{/web/schools}">
+                <i class="bi bi-building me-2"></i>
+                Schools
+            </a>
+        </li>
+
+        <!-- Students -->
+        <li th:classappend="${activePage == 'students'} ? 'active'">
+            <a th:href="@{/web/students}">
+                <i class="bi bi-people me-2"></i>
+                Students
+            </a>
+        </li>
+
+        <!-- Fees -->
+        <li th:classappend="${activePage == 'fees'} ? 'active'">
+            <a data-bs-toggle="collapse"
+               href="#feesMenu"
+               role="button">
+                <i class="bi bi-cash-stack me-2"></i>
+                Fees
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+            <div class="collapse" id="feesMenu">
+                <ul class="list-unstyled ps-3">
+                    <li>
+                        <a th:href="@{/web/fees/structure}">
+                            Fee Structure
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/web/fees/collect}">
+                            Collect Fee
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/web/fees/outstanding}">
+                            Outstanding
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- Attendance -->
+        <li th:classappend="${activePage == 'attendance'} ? 'active'">
+            <a data-bs-toggle="collapse"
+               href="#attendanceMenu"
+               role="button">
+                <i class="bi bi-calendar-check me-2"></i>
+                Attendance
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+            <div class="collapse" id="attendanceMenu">
+                <ul class="list-unstyled ps-3">
+                    <li>
+                        <a th:href="@{/web/attendance/mark}">
+                            Mark Attendance
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/web/attendance/report}">
+                            Report
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- Messages -->
+        <li th:classappend="${activePage == 'messages'} ? 'active'">
+            <a th:href="@{/web/messages}">
+                <i class="bi bi-chat-dots me-2"></i>
+                Messages
+            </a>
+        </li>
+
+        <!-- Settings -->
+        <li th:classappend="${activePage == 'settings'} ? 'active'">
+            <a th:href="@{/web/settings}">
+                <i class="bi bi-gear me-2"></i>
+                Settings
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
+</body>
+</html>
