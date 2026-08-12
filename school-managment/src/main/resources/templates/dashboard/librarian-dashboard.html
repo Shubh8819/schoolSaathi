@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Librarian Dashboard</title>
+    <style>
+        .stat-card { border-radius: 16px; padding: 22px 18px; border: none; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 16px 16px 0 0; }
+        .card-indigo::before { background: linear-gradient(90deg,#4f46e5,#818cf8); }
+        .card-green::before  { background: linear-gradient(90deg,#059669,#34d399); }
+        .card-amber::before  { background: linear-gradient(90deg,#d97706,#fbbf24); }
+        .card-red::before    { background: linear-gradient(90deg,#dc2626,#f87171); }
+        .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 0.78rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+        .hero-card { background: linear-gradient(135deg, #92400e 0%, #b45309 60%, #d97706 100%); border-radius: 20px; padding: 28px 32px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden; }
+        .hero-card::after { content: '📚'; position: absolute; right: 32px; top: 50%; transform: translateY(-50%); font-size: 5rem; opacity: 0.15; }
+        .quick-action-btn { border-radius: 14px; padding: 18px 14px; text-align: center; border: 1px solid #e2e8f0; transition: all 0.2s; text-decoration: none; display: block; }
+        .quick-action-btn:hover { border-color: #b45309; box-shadow: 0 6px 20px rgba(180,83,9,0.12); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Librarian Hero -->
+    <div class="hero-card mb-4">
+        <div>
+            <p class="mb-1" style="opacity:0.85;font-size:0.9rem;"><i class="bi bi-book-fill me-1"></i>Library Management</p>
+            <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:4px;">Good day, <span th:text="${userDetails.name}">Librarian</span>! 📖</h2>
+            <p style="opacity:0.85;margin:0;font-size:0.9rem;">Manage school library, books, and student borrowing records.</p>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card card-indigo shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div style="font-size:2rem;color:#4f46e5;margin-bottom:10px;"><i class="bi bi-people-fill"></i></div>
+                    <div class="stat-value" style="color:#4f46e5;" th:text="${dashboard.totalStudents ?: 0}">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card card-green shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div style="font-size:2rem;color:#059669;margin-bottom:10px;"><i class="bi bi-person-badge-fill"></i></div>
+                    <div class="stat-value text-success" th:text="${dashboard.totalTeachers ?: 0}">0</div>
+                    <div class="stat-label">Total Teachers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card card-amber shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div style="font-size:2rem;color:#d97706;margin-bottom:10px;"><i class="bi bi-person-fill-check"></i></div>
+                    <div class="stat-value" style="color:#d97706;" th:text="${dashboard.presentToday ?: 0}">0</div>
+                    <div class="stat-label">Present Today</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card card-red shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div style="font-size:2rem;color:#dc2626;margin-bottom:10px;"><i class="bi bi-person-fill-x"></i></div>
+                    <div class="stat-value text-danger" th:text="${dashboard.absentToday ?: 0}">0</div>
+                    <div class="stat-label">Absent Today</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Quick Actions + Info -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3">
+                    <span class="fw-bold text-dark"><i class="bi bi-lightning-fill text-warning me-2"></i>Library Quick Actions</span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <a th:href="@{/web/library/books}" class="quick-action-btn bg-white">
+                                <i class="bi bi-book-fill fs-2 text-primary mb-2 d-block"></i>
+                                <span class="small fw-semibold text-dark">Manage Books</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a th:href="@{/web/library/issue}" class="quick-action-btn bg-white">
+                                <i class="bi bi-box-arrow-right fs-2 text-success mb-2 d-block"></i>
+                                <span class="small fw-semibold text-dark">Issue Book</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a th:href="@{/web/library/return}" class="quick-action-btn bg-white">
+                                <i class="bi bi-box-arrow-in-left fs-2 text-warning mb-2 d-block"></i>
+                                <span class="small fw-semibold text-dark">Return Book</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a th:href="@{/web/students}" class="quick-action-btn bg-white">
+                                <i class="bi bi-people-fill fs-2 text-info mb-2 d-block"></i>
+                                <span class="small fw-semibold text-dark">Student List</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today School Summary -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3">
+                    <span class="fw-bold text-dark"><i class="bi bi-info-circle-fill text-info me-2"></i>School Today</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <span class="text-muted">Students Present</span>
+                        <span class="fw-bold text-success" th:text="${dashboard.presentToday ?: 0}">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <span class="text-muted">Students Absent</span>
+                        <span class="fw-bold text-danger" th:text="${dashboard.absentToday ?: 0}">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <span class="text-muted">Attendance Rate</span>
+                        <span class="fw-bold text-primary" th:text="${dashboard.todayAttendancePercent ?: 0} + '%'">0%</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-3">
+                        <span class="text-muted">Total Classes</span>
+                        <span class="fw-bold text-dark" th:text="${dashboard.totalClasses ?: 0}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

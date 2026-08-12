@@ -4,6 +4,7 @@ package com.schoolsaathi.school_managment.controller.web;
 import com.schoolsaathi.school_managment.dto.request.SchoolRegistrationDto;
 import com.schoolsaathi.school_managment.dto.request.SchoolUpdateDto;
 import com.schoolsaathi.school_managment.dto.response.SchoolResponseDto;
+import com.schoolsaathi.school_managment.enums.*;
 import com.schoolsaathi.school_managment.service.SchoolService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,72 +79,35 @@ public class SchoolWebController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
 
-        model.addAttribute(
-                "schoolDto",
-                new SchoolRegistrationDto()
-        );
-
-        // Dropdowns ke liye
-        model.addAttribute("boardTypes",
-                com.schoolsaathi.school_managment.enums
-                        .BoardType.values());
-        model.addAttribute("schoolTypes",
-                com.schoolsaathi.school_managment.enums
-                        .SchoolType.values());
+        model.addAttribute("schoolDto",new SchoolRegistrationDto());
+        model.addAttribute("boardTypes",com.schoolsaathi.school_managment.enums.BoardType.values());
+        model.addAttribute("schoolTypes",com.schoolsaathi.school_managment.enums.SchoolType.values());
 
         return "school/add";
     }
 
     @PostMapping("/add")
-    public String addSchool(
-            @Valid @ModelAttribute("schoolDto")
-            SchoolRegistrationDto dto,
-            BindingResult result,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String addSchool(@Valid @ModelAttribute("schoolDto") SchoolRegistrationDto dto, BindingResult result,RedirectAttributes redirectAttributes,Model model) {
 
         // Validation errors
         if (result.hasErrors()) {
-            model.addAttribute("boardTypes",
-                    com.schoolsaathi.school_managment.enums
-                            .BoardType.values());
-            model.addAttribute("schoolTypes",
-                    com.schoolsaathi.school_managment.enums
-                            .SchoolType.values());
+            model.addAttribute("boardTypes",BoardType.values());
+            model.addAttribute("schoolTypes",SchoolType.values());
             return "school/add";
         }
-
         // Email already exists check
         if (schoolService.isEmailExists(dto.getEmail())) {
-            result.rejectValue(
-                    "email",
-                    "duplicate",
-                    "Email already registered"
-            );
+            result.rejectValue("email","duplicate","Email already registered");
             return "school/add";
         }
 
         try {
-            SchoolResponseDto school =
-                    schoolService.registerSchool(dto);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "School registered successfully! "
-                            + "Code: "
-                            + school.getSchoolCode()
-            );
-
-            return "redirect:/web/schools/"
-                    + school.getId();
-
+            SchoolResponseDto school = schoolService.registerSchool(dto);
+            redirectAttributes.addFlashAttribute("successMessage","School registered successfully! "+ "Code: "+ school.getSchoolCode());
+            return "redirect:/web/schools";
         } catch (Exception e) {
-            log.error("Error registering school: {}",
-                    e.getMessage());
-            model.addAttribute(
-                    "errorMessage",
-                    "Something went wrong. Try again."
-            );
+            log.error("Error registering school: {}",e.getMessage());
+            model.addAttribute("errorMessage","Something went wrong. Try again.");
             return "school/add";
         }
     }

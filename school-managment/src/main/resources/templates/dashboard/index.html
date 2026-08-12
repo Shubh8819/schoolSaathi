@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Principal Dashboard</title>
+    <style>
+        /* ── Glow Stat Cards ───────────────── */
+        .glow-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px 20px;
+            border: 1px solid #e8eaf6;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .glow-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(79,70,229,0.13);
+        }
+        .glow-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            border-radius: 16px 16px 0 0;
+        }
+        .glow-card.indigo::before { background: linear-gradient(90deg,#4f46e5,#818cf8); }
+        .glow-card.green::before  { background: linear-gradient(90deg,#059669,#34d399); }
+        .glow-card.amber::before  { background: linear-gradient(90deg,#d97706,#fbbf24); }
+        .glow-card.red::before    { background: linear-gradient(90deg,#dc2626,#f87171); }
+        .glow-card.cyan::before   { background: linear-gradient(90deg,#0891b2,#22d3ee); }
+
+        .glow-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 14px;
+        }
+        .glow-icon.indigo { background:#eef2ff; }
+        .glow-icon.green  { background:#ecfdf5; }
+        .glow-icon.amber  { background:#fffbeb; }
+        .glow-icon.red    { background:#fef2f2; }
+        .glow-icon.cyan   { background:#ecfeff; }
+
+        .glow-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+            color: #1e1b4b;
+        }
+        .glow-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Greeting Header ───────────────── */
+        .greeting-header {
+            background: linear-gradient(135deg,
+                #1e1b4b 0%, #4f46e5 60%, #818cf8 100%);
+            border-radius: 20px;
+            padding: 28px 32px;
+            color: #fff;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .greeting-header::after {
+            content: '🏫';
+            position: absolute;
+            right: 32px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 5rem;
+            opacity: 0.15;
+        }
+        .greeting-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+        }
+        .greeting-sub {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            margin: 0;
+        }
+
+        /* ── Teacher Cards ─────────────────── */
+        .teacher-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1.5px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .teacher-card:hover {
+            border-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+        }
+        .teacher-card.absent {
+            border-color: #fecaca;
+            background: #fff5f5;
+        }
+        .teacher-card.not-marked {
+            border-color: #e2e8f0;
+            background: #f8faff;
+        }
+
+        .t-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            color: #fff;
+        }
+        .t-avatar.present    { background: #059669; }
+        .t-avatar.absent     { background: #dc2626; }
+        .t-avatar.not-marked { background: #94a3b8; }
+
+        .t-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin: 0;
+        }
+        .t-sub {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin: 0;
+        }
+        .t-badge {
+            margin-left: auto;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .t-badge.present    { background:#d1fae5; color:#065f46; }
+        .t-badge.absent     { background:#fee2e2; color:#991b1b; }
+        .t-badge.not-marked { background:#f1f5f9; color:#475569; }
+
+        /* ── Class Coverage Grid ───────────── */
+        .coverage-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        .coverage-pill.covered {
+            background: #f0fdf4;
+            border-left: 4px solid #059669;
+        }
+        .coverage-pill.uncovered {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+        }
+        .coverage-class {
+            font-weight: 700;
+            color: #1e1b4b;
+        }
+        .coverage-teacher {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        /* ── Alert Ticker ──────────────────── */
+        .alert-ticker {
+            background: linear-gradient(90deg,
+                #1e1b4b, #312e81);
+            border-radius: 10px;
+            padding: 12px 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .ticker-label {
+            background: #dc2626;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ticker-text {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Section Headers ───────────────── */
+        .section-hdr {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin: 0 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-hdr::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        /* ── Progress Ring (CSS only) ──────── */
+        .ring-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ring-container {
+            position: relative;
+            width: 120px; height: 120px;
+            margin-bottom: 8px;
+        }
+        .ring-svg { transform: rotate(-90deg); }
+        .ring-bg   { fill: none; stroke: #e2e8f0; stroke-width: 10; }
+        .ring-fill {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+        .ring-fill.green  { stroke: #059669; }
+        .ring-fill.indigo { stroke: #4f46e5; }
+        .ring-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1e1b4b;
+        }
+        .ring-label {
+            font-size: 0.78rem;
+            color: #64748b;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* ── Fee Bar ───────────────────────── */
+        .fee-bar-wrap { margin-bottom: 20px; }
+        .fee-bar-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .fee-bar-label {
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .fee-bar-val {
+            font-size: 0.83rem;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        .fee-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        .fee-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            background: linear-gradient(90deg,
+                #4f46e5, #818cf8);
+            transition: width 1.2s ease;
+        }
+
+        /* ── Card base ─────────────────────── */
+        .dash-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            height: 100%;
+        }
+        .dash-card-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e1b4b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <!-- ── Greeting Header ──────────────────── -->
+    <div class="greeting-header">
+        <p class="greeting-title"
+           id="greetingText">
+            Good Morning, Principal! 👋
+        </p>
+        <p class="greeting-sub"
+           id="greetingDate">
+            Loading date...
+        </p>
+    </div>
+
+    <!-- ── Alert Ticker ─────────────────────── -->
+    <div class="alert-ticker"
+         th:if="${dashboard.classesWithoutTeacher > 0
+              or dashboard.teachersAbsentToday > 0}">
+        <span class="ticker-label">⚠ Alert</span>
+        <span class="ticker-text">
+        <span th:if="${dashboard.teachersAbsentToday > 0}">
+            <span th:text="${dashboard.teachersAbsentToday}"></span>
+            teacher(s) absent today
+        </span>
+        <span th:if="${dashboard.classesWithoutTeacher > 0}">
+             ·
+            <span th:text="${dashboard.classesWithoutTeacher}"></span>
+            class(es) without assigned teacher
+        </span>
+        <span th:if="${dashboard.studentsWithPendingFees > 0}">
+             ·
+            <span th:text="${dashboard.studentsWithPendingFees}"></span>
+            fee defaulters
+        </span>
+    </span>
+    </div>
+
+    <!-- ── Top Stat Cards ───────────────────── -->
+    <div class="row g-3 mb-4">
+
+        <!-- Teachers Present -->
+        <div class="col-6 col-md-3">
+            <div class="glow-card green">
+                <div class="glow-icon green">👨‍🏫</div>
+                <div class="glow-value text-success"
+                     th:text="${dashboard.teachersPresentToday}">
+                    0
+                </div>
+                <div class="glow-label">
+                    Teachers Present
+                </div>
+                <small class="text-muted"
+                       th:text="'of ' + ${dashboard.totalTeachers} + ' total'">
+                </small>
+            </div>
+        </div>
+
+        <!-- Teachers Absent -->
+        <div class="col-6 col-md-3">
+            <div class="glow-card red">
+                <div class="glow-icon red">🚨</div>
+                <div class="glow-value text-danger"
+                     th:text="${dashboard.teachersAbsentToday}">
+                    0
+                </div>
+                <div class="glow-label">
+                    Teachers Absent
+                </div>
+                <small class="text-muted"
+                       th:text="${dashboard.classesWithoutTeacher} + ' classes uncovered'">
+                </small>
+            </div>
+        </div>
+
+        <!-- Total Students -->
+        <div class="col-6 col-md-3">
+            <div class="glow-card indigo">
+                <div class="glow-icon indigo">👨‍🎓</div>
+                <div class="glow-value"
+                     th:text="${dashboard.activeStudents}">
+                    0
+                </div>
+                <div class="glow-label">
+                    Active Students
+                </div>
+                <small class="text-muted"
+                       th:text="${dashboard.totalClasses} + ' classes · ' + ${dashboard.totalSections} + ' sections'">
+                </small>
+            </div>
+        </div>
+
+        <!-- Fees This Month -->
+        <div class="col-6 col-md-3">
+            <div class="glow-card amber">
+                <div class="glow-icon amber">💰</div>
+                <div class="glow-value text-warning"
+                     style="font-size:1.5rem;">
+                    ₹<span th:text="${#numbers.formatDecimal(
+                    dashboard.feesCollectedThisMonth,
+                    0, 'COMMA', 0, 'POINT')}">
+                </span>
+                </div>
+                <div class="glow-label">
+                    Fees This Month
+                </div>
+                <small class="text-muted"
+                       th:text="${dashboard.studentsWithPendingFees} + ' pending'">
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── Middle Row — Rings + Teacher List ── -->
+    <div class="row g-3 mb-4">
+
+        <!-- Attendance Rings -->
+        <div class="col-md-3">
+            <div class="dash-card text-center">
+                <div class="dash-card-title">
+                    Aaj Ka Overview
+                </div>
+
+                <!-- Teacher Attendance Ring -->
+                <div class="ring-wrap mb-3">
+                    <div class="ring-container">
+                        <svg class="ring-svg"
+                             width="120" height="120"
+                             viewBox="0 0 120 120">
+                            <circle class="ring-bg"
+                                    cx="60" cy="60" r="50"/>
+                            <circle class="ring-fill green"
+                                    cx="60" cy="60" r="50"
+                                    stroke-dasharray="314"
+                                    th:attr="stroke-dashoffset=${314 - (314 * dashboard.teachersPresentToday / (dashboard.totalTeachers > 0 ? dashboard.totalTeachers : 1))}"/>
+                        </svg>
+                        <div class="ring-text">
+                        <span th:text="${dashboard.totalTeachers > 0 ?
+                            #numbers.formatDecimal(dashboard.teachersPresentToday * 100.0 / dashboard.totalTeachers, 0, 0) : 0}">
+                        </span>%
+                        </div>
+                    </div>
+                    <div class="ring-label">
+                        Teacher Attendance
+                    </div>
+                </div>
+
+                <!-- Student Attendance Ring -->
+                <div class="ring-wrap">
+                    <div class="ring-container">
+                        <svg class="ring-svg"
+                             width="120" height="120"
+                             viewBox="0 0 120 120">
+                            <circle class="ring-bg"
+                                    cx="60" cy="60" r="50"/>
+                            <circle class="ring-fill indigo"
+                                    cx="60" cy="60" r="50"
+                                    stroke-dasharray="314"
+                                    th:attr="stroke-dashoffset=${314 - (314 * dashboard.todayAttendancePercent / 100.0)}"/>
+                        </svg>
+                        <div class="ring-text"
+                             th:text="${dashboard.todayAttendancePercent} + '%'">
+                        </div>
+                    </div>
+                    <div class="ring-label">
+                        Student Attendance
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher List -->
+        <div class="col-md-5">
+            <div class="dash-card"
+                 style="overflow-y:auto; max-height:440px;">
+                <div class="dash-card-title">
+                    <span>👨‍🏫 Teacher Status Today</span>
+                    <span class="badge"
+                          style="background:#eef2ff;color:#4f46e5;font-size:0.75rem;"
+                          th:text="${dashboard.totalTeachers} + ' Total'">
+                </span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(dashboard.teacherAttendanceList)}"
+                     class="text-center text-muted py-4">
+                    Koi teacher data nahi mila
+                </div>
+
+                <div th:each="t : ${dashboard.teacherAttendanceList}">
+                    <div th:classappend="${t.status == 'ABSENT'} ? 'teacher-card absent' :
+                                     (${t.status == 'NOT_MARKED'} ? 'teacher-card not-marked' : 'teacher-card')">
+
+                        <div th:classappend="${t.status == 'ABSENT'} ? 't-avatar absent' :
+                                         (${t.status == 'NOT_MARKED'} ? 't-avatar not-marked' : 't-avatar present')"
+                             th:text="${t.avatarInitials}">
+                        </div>
+
+                        <div style="flex:1; min-width:0;">
+                            <p class="t-name"
+                               th:text="${t.teacherName}"></p>
+                            <p class="t-sub"
+                               th:text="${t.designation} + ' · ' + ${t.assignedClass} + '-' + ${t.assignedSection}">
+                            </p>
+                        </div>
+
+                        <span th:classappend="${t.status == 'ABSENT'} ? 't-badge absent' :
+                                          (${t.status == 'NOT_MARKED'} ? 't-badge not-marked' : 't-badge present')"
+                              th:text="${t.status == 'NOT_MARKED'} ? 'Not Marked' : ${t.status}">
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Coverage -->
+        <div class="col-md-4">
+            <div class="dash-card"
+                 style="overflow-y:auto; max-height:440px;">
+                <div class="dash-card-title">
+                    <span>🏫 Class Coverage</span>
+                    <span th:if="${dashboard.classesWithoutTeacher > 0}"
+                          class="badge bg-danger"
+                          th:text="${dashboard.classesWithoutTeacher} + ' uncovered'">
+                </span>
+                    <span th:if="${dashboard.classesWithoutTeacher == 0}"
+                          class="badge"
+                          style="background:#d1fae5;color:#065f46;">
+                    All Covered ✓
+                </span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(dashboard.classCoverageList)}"
+                     class="text-center text-muted py-4">
+                    Koi class data nahi
+                </div>
+
+                <div th:each="cov : ${dashboard.classCoverageList}">
+                    <div th:classappend="${cov.isCovered} ? 'coverage-pill covered' : 'coverage-pill uncovered'">
+                        <div>
+                            <div class="coverage-class"
+                                 th:text="${cov.className} + ' - ' + ${cov.sectionName}">
+                            </div>
+                            <div class="coverage-teacher"
+                                 th:text="${cov.teacherName != null} ? ${cov.teacherName} : '⚠ No teacher assigned'">
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <small class="text-muted"
+                                   th:text="${cov.totalStudents} + ' students'">
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── Bottom Row — Fee Chart + Alerts ─── -->
+    <div class="row g-3 mb-4">
+
+        <!-- Fee Collection Chart -->
+        <div class="col-md-6">
+            <div class="dash-card">
+                <div class="dash-card-title">
+                    📈 Monthly Fee Collection
+                </div>
+
+                <div th:if="${#lists.isEmpty(dashboard.monthlyFeeCollection)}"
+                     class="text-center text-muted py-4">
+                    Koi fee data nahi
+                </div>
+
+                <div th:each="fee : ${dashboard.monthlyFeeCollection}">
+                    <div class="fee-bar-wrap">
+                        <div class="fee-bar-top">
+                        <span class="fee-bar-label"
+                              th:text="${fee.month} + ' ' + ${fee.year}">
+                        </span>
+                            <span class="fee-bar-val"
+                                  th:text="'₹' + ${#numbers.formatDecimal(fee.amount, 0, 'COMMA', 0, 'POINT')}">
+                        </span>
+                        </div>
+                        <div class="fee-bar-bg">
+                            <div class="fee-bar-fill"
+                                 th:style="'width:' + ${fee.amount.compareTo(java.math.BigDecimal.ZERO) > 0 ? '70' : '0'} + '%'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Attendance + Fee Defaulters -->
+        <div class="col-md-6">
+            <div class="row g-3 h-100">
+
+                <!-- Low Attendance -->
+                <div class="col-12">
+                    <div class="dash-card">
+                        <div class="dash-card-title">
+                            📉 Low Attendance Students
+                            <span class="badge bg-warning text-dark"
+                                  th:text="${#lists.size(dashboard.lowAttendanceStudents)}">
+                        </span>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(dashboard.lowAttendanceStudents)}"
+                             class="text-success small">
+                            ✅ Sab students 75%+ attendance pe hain!
+                        </div>
+
+                        <div th:each="s,i : ${dashboard.lowAttendanceStudents}"
+                             th:if="${i.index < 5}"
+                             class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                            <span class="fw-semibold small"
+                                  th:text="${s.studentName}">
+                            </span>
+                                <span class="text-muted small ms-1"
+                                      th:text="'(' + ${s.className} + '-' + ${s.sectionName} + ')'">
+                            </span>
+                            </div>
+                            <span class="badge bg-danger"
+                                  th:text="${s.attendancePercent} + '%'">
+                        </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fee Defaulters -->
+                <div class="col-12">
+                    <div class="dash-card">
+                        <div class="dash-card-title">
+                            💸 Fee Defaulters
+                            <span class="badge bg-danger"
+                                  th:text="${#lists.size(dashboard.feeDefaulters)}">
+                        </span>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(dashboard.feeDefaulters)}"
+                             class="text-success small">
+                            ✅ Koi pending fees nahi!
+                        </div>
+
+                        <div th:each="d,i : ${dashboard.feeDefaulters}"
+                             th:if="${i.index < 5}"
+                             class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                            <span class="fw-semibold small"
+                                  th:text="${d.studentName}">
+                            </span>
+                                <span class="text-muted small ms-1"
+                                      th:text="'(' + ${d.className} + ')'">
+                            </span>
+                            </div>
+                            <span class="badge bg-danger"
+                                  th:text="'₹' + ${#numbers.formatDecimal(d.pendingAmount, 0, 'COMMA', 0, 'POINT')}">
+                        </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts — base.html ke bahar nahi, andar -->
+<th:block layout:fragment="scripts">
+    <script>
+        // ── Greeting ────────────────────────────
+        const hour = new Date().getHours();
+        const greet = hour < 12 ? 'Good Morning'
+                    : hour < 17 ? 'Good Afternoon'
+                    :              'Good Evening';
+        document.getElementById('greetingText')
+                .textContent = greet + ', Principal! 👋';
+
+        const days = ['Sunday','Monday','Tuesday',
+                      'Wednesday','Thursday',
+                      'Friday','Saturday'];
+        const months = ['January','February','March',
+                        'April','May','June','July',
+                        'August','September','October',
+                        'November','December'];
+        const now = new Date();
+        document.getElementById('greetingDate')
+                .textContent =
+                    days[now.getDay()] + ', '
+                    + now.getDate() + ' '
+                    + months[now.getMonth()] + ' '
+                    + now.getFullYear()
+                    + '  ·  Today\'s school overview';
+    </script>
+</th:block>
+
+</body>
+</html>

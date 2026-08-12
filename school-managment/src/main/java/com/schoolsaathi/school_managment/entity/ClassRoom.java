@@ -21,6 +21,8 @@ import java.util.List;
 @Builder
 public class ClassRoom extends BaseEntity {
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id",
             insertable = false,

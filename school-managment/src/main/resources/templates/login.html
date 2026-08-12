@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - SchoolSaathi</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 12px;
+            padding: 40px 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 28px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #2563eb;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1e40af;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .btn-login:hover {
+            background: #1e3a8a;
+        }
+        .alert {
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <div class="logo">SchoolSaathi</div>
+    <div class="subtitle">School Management, Simplified</div>
+
+    <!-- Wrong credentials -->
+    <div class="alert alert-error" th:if="${param.error}">
+        Invalid email or password. Please try again.
+    </div>
+
+    <!-- After logout -->
+    <div class="alert alert-info" th:if="${param.logout}">
+        You have been logged out successfully.
+    </div>
+
+    <!-- Session expired (maximumSessions = 1) -->
+    <div class="alert alert-info" th:if="${param.expired}">
+        Your session has expired. Please log in again.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="username" required autofocus placeholder="you@school.edu.in">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-login">Login</button>
+    </form>
+</div>
+</body>
+</html>

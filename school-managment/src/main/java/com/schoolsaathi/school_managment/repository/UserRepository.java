@@ -69,6 +69,14 @@ public interface UserRepository
             UUID schoolId, UserRole role
     );
 
+    List<User> findAllByDepartmentIdAndIsDeletedFalse(
+            UUID departmentId
+    );
+
+    List<User> findAllByDesignationEntityIdAndIsDeletedFalse(
+            UUID designationId
+    );
+
     // ─────────────────────────────────────
     // Count Queries
     // ─────────────────────────────────────

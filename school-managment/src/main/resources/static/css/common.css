@@ -1,0 +1,335 @@
+/* ============================================================
+   SchoolSaathi — Common Design System
+   -------------------------------------------------------------
+   HOW TO CHANGE THE APP'S COLOR THEME:
+   Just edit the values inside :root { } below. Every page/
+   component that uses var(--primary), var(--danger) etc. will
+   update automatically — no need to touch individual pages.
+
+   To switch to a completely different preset instantly, apply
+   data-theme="green" (or "purple", "dark") on the <html> tag —
+   see the [data-theme] blocks near the bottom.
+   ============================================================ */
+
+:root {
+    /* ---------- Brand / Primary ---------- */
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+    --primary-contrast: #ffffff;
+
+    /* ---------- Secondary / Accent ---------- */
+    --secondary: #7c3aed;
+    --secondary-light: #ede9fe;
+
+    /* ---------- Semantic ---------- */
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --warning: #d97706;
+    --warning-light: #fffbeb;
+    --info: #0891b2;
+    --info-light: #ecfeff;
+
+    /* ---------- Neutrals / Text ---------- */
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --text-on-primary: #ffffff;
+
+    /* ---------- Surfaces ---------- */
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    /* ---------- Shape / Spacing ---------- */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+
+    /* ---------- Typography ---------- */
+    --font-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --fs-xs: 12px;
+    --fs-sm: 13px;
+    --fs-base: 14px;
+    --fs-md: 15px;
+    --fs-lg: 18px;
+    --fs-xl: 24px;
+}
+
+/* ============================================================
+   PRESET THEMES — apply via <html data-theme="green">
+   Each preset only needs to override the handful of variables
+   that actually change; everything else (radius, spacing,
+   neutrals) stays shared.
+   ============================================================ */
+
+[data-theme="green"] {
+    --primary: #16a34a;
+    --primary-dark: #15803d;
+    --primary-light: #dcfce7;
+}
+
+[data-theme="purple"] {
+    --primary: #7c3aed;
+    --primary-dark: #6d28d9;
+    --primary-light: #ede9fe;
+}
+
+[data-theme="amber"] {
+    --primary: #d97706;
+    --primary-dark: #b45309;
+    --primary-light: #fef3c7;
+}
+
+[data-theme="dark"] {
+    --bg-page: #0f172a;
+    --bg-card: #1e293b;
+    --bg-hover: #273449;
+    --border: #334155;
+    --border-strong: #475569;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-faint: #64748b;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-base);
+    background: var(--bg-page);
+    color: var(--text-main);
+    margin: 0;
+    font-size: var(--fs-base);
+}
+
+.page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+}
+
+.page-header h1 {
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--text-main);
+}
+
+.page-header p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: var(--fs-base);
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-section { margin-bottom: 32px; }
+.form-section:last-of-type { margin-bottom: 0; }
+
+.section-title {
+    font-size: var(--fs-md);
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--text-main);
+}
+
+.section-sub {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    margin: 0 0 16px;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 20px;
+}
+
+.form-grid.full { grid-template-columns: 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.span-2 { grid-column: span 2; }
+
+label {
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+label .required { color: var(--danger); margin-left: 2px; }
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="password"],
+select,
+textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-base);
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg-card);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+input.is-invalid, select.is-invalid, textarea.is-invalid {
+    border-color: var(--danger);
+}
+
+.error-text { font-size: var(--fs-xs); color: var(--danger); margin: 0; }
+.hint-text { font-size: var(--fs-xs); color: var(--text-muted); margin: 0; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-base);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-primary { background: var(--primary); color: var(--text-on-primary); }
+.btn-primary:hover { background: var(--primary-dark); }
+
+.btn-secondary { background: var(--bg-card); border-color: var(--border); color: var(--text-main); }
+.btn-secondary:hover { background: var(--bg-hover); }
+
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-outline-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+
+.btn-sm { padding: 6px 14px; font-size: var(--fs-sm); }
+
+/* ============================================================
+   ALERTS / BADGES / TAGS
+   ============================================================ */
+
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-sm);
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+
+.alert-error   { background: var(--danger-light);  color: var(--danger);  border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+.alert-success { background: var(--success-light); color: var(--success); border-color: color-mix(in srgb, var(--success) 30%, transparent); }
+.alert-warning { background: var(--warning-light); color: var(--warning); border-color: color-mix(in srgb, var(--warning) 30%, transparent); }
+.alert-info    { background: var(--info-light);    color: var(--info);    border-color: color-mix(in srgb, var(--info) 30%, transparent); }
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+
+.badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-danger  { background: var(--danger-light);  color: var(--danger); }
+.badge-muted   { background: var(--bg-hover);       color: var(--text-muted); }
+
+/* ============================================================
+   STEP INDICATOR (used in onboarding wizards)
+   ============================================================ */
+
+.step-indicator { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.step-item { display: flex; align-items: center; gap: 10px; }
+
+.step-circle {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--fs-sm); font-weight: 600;
+}
+
+.step-circle.active  { background: var(--primary); color: var(--text-on-primary); }
+.step-circle.done     { background: var(--success); color: #fff; }
+.step-circle.pending  { background: var(--bg-hover); color: var(--text-muted); }
+
+.step-label { font-size: var(--fs-base); font-weight: 500; color: var(--text-main); }
+.step-label.pending { color: var(--text-muted); }
+.step-divider { flex: 1; height: 2px; background: var(--border); }
+
+/* ============================================================
+   TABLE (student lists, fee lists, etc.)
+   ============================================================ */
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: var(--fs-base); }
+.data-table th {
+    text-align: left; padding: 10px 12px;
+    background: var(--bg-hover); color: var(--text-muted);
+    font-size: var(--fs-xs); font-weight: 600; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+}
+.data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+.data-table tr:hover td { background: var(--bg-hover); }
+
+/* ============================================================
+   SIDEBAR NAV (dashboard shell)
+   ============================================================ */
+
+.sidebar { background: var(--bg-card); border-right: 1px solid var(--border); }
+.sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: var(--radius-sm);
+    color: var(--text-muted); font-size: var(--fs-base); text-decoration: none;
+}
+.sidebar-link:hover { background: var(--bg-hover); color: var(--text-main); }
+.sidebar-link.active { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+
+
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .field.span-2 { grid-column: span 1; }
+}
+

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Add Staff / User</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- Navigation Back -->
+            <div class="mb-3">
+                <a th:href="@{/web/users}" class="text-decoration-none text-muted">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Staff & Users
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-person-plus-fill text-primary me-2"></i>Add Staff / User Registration
+                    </h5>
+                    <p class="text-muted small mb-0 mt-1">Register a new employee and assign them to a Department and Designation to automatically grant action rights.</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form th:action="@{/web/users/add}" th:object="${userDto}" method="post">
+
+                        <div class="row g-3">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" id="name" th:field="*{name}" class="form-control py-2" placeholder="e.g. Rahul Sharma" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" id="email" th:field="*{email}" class="form-control py-2" placeholder="e.g. rahul@school.com" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" id="phone" th:field="*{phone}" class="form-control py-2" placeholder="10-digit mobile number">
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                                <input type="password" id="password" th:field="*{password}" class="form-control py-2" placeholder="Minimum 8 characters" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            </div>
+
+                            <!-- Role & Employment Details -->
+                            <div class="col-md-6">
+                                <label for="role" class="form-label fw-semibold">System Role <span class="text-danger">*</span></label>
+                                <select id="role" th:field="*{role}" class="form-select py-2" required>
+                                    <option value="">-- Select System Role --</option>
+                                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROLE</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="employeeId" class="form-label fw-semibold">Employee ID / Code</label>
+                                <input type="text" id="employeeId" th:field="*{employeeId}" class="form-control py-2" placeholder="e.g. EMP-101">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="joiningDate" class="form-label fw-semibold">Joining Date</label>
+                                <input type="date" id="joiningDate" th:field="*{joiningDate}" class="form-control py-2">
+                            </div>
+
+                            <!-- Department & Designation Selection -->
+                            <div class="col-12"><hr class="my-3"></div>
+                            <div class="col-12">
+                                <h6 class="fw-bold text-dark mb-1">
+                                    <i class="bi bi-diagram-3-fill text-primary me-2"></i>Department & Designation Assignment
+                                </h6>
+                                <p class="text-muted small mb-3">Select a department and designation. The user will automatically inherit the rights attached to the selected designation.</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="departmentId" class="form-label fw-semibold">Department</label>
+                                <select id="departmentId" th:field="*{departmentId}" class="form-select py-2" onchange="loadDesignations(this.value)">
+                                    <option value="">-- Select Department --</option>
+                                    <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}">Department</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="designationId" class="form-label fw-semibold">Designation & Role</label>
+                                <select id="designationId" th:field="*{designationId}" class="form-select py-2" onchange="previewRights(this.value)">
+                                    <option value="">-- Select Department First --</option>
+                                </select>
+                            </div>
+
+                            <!-- Live Rights Preview Box -->
+                            <div class="col-12">
+                                <div id="rightsPreviewContainer" class="card border rounded-3 p-3 bg-light-subtle d-none">
+                                    <h6 class="fw-bold text-dark mb-2">
+                                        <i class="bi bi-shield-check text-success me-2"></i>Inherited Rights & Authorities:
+                                    </h6>
+                                    <div id="rightsBadges" class="d-flex flex-wrap gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a th:href="@{/web/users}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="bi bi-check-circle me-1"></i>Save User
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+    function loadDesignations(departmentId) {
+        const designationSelect = document.getElementById('designationId');
+        const previewBox = document.getElementById('rightsPreviewContainer');
+        designationSelect.innerHTML = '<option value="">-- Loading Designations... --</option>';
+        previewBox.classList.add('d-none');
+
+        if (!departmentId) {
+            designationSelect.innerHTML = '<option value="">-- Select Department First --</option>';
+            return;
+        }
+
+        fetch('/api/v1/departments/' + departmentId + '/designations')
+            .then(res => res.json())
+            .then(response => {
+                designationSelect.innerHTML = '<option value="">-- Select Designation --</option>';
+                if (response.success && response.data && response.data.length > 0) {
+                    window.currentDesignations = response.data;
+                    response.data.forEach(d => {
+                        const option = document.createElement('option');
+                        option.value = d.id;
+                        option.textContent = d.title + (d.code ? ' (' + d.code + ')' : '');
+                        designationSelect.appendChild(option);
+                    });
+                } else {
+                    designationSelect.innerHTML = '<option value="">-- No Designations Available --</option>';
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching designations:', err);
+                designationSelect.innerHTML = '<option value="">-- Error Loading --</option>';
+            });
+    }
+
+    function previewRights(designationId) {
+        const previewBox = document.getElementById('rightsPreviewContainer');
+        const rightsBadges = document.getElementById('rightsBadges');
+        rightsBadges.innerHTML = '';
+
+        if (!designationId || !window.currentDesignations) {
+            previewBox.classList.add('d-none');
+            return;
+        }
+
+        const selected = window.currentDesignations.find(d => d.id === designationId);
+        if (selected && selected.authorities && selected.authorities.length > 0) {
+            selected.authorities.forEach(auth => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2';
+                badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>' + auth;
+                rightsBadges.appendChild(badge);
+            });
+            previewBox.classList.remove('d-none');
+        } else {
+            previewBox.classList.remove('d-none');
+            rightsBadges.innerHTML = '<span class="text-muted small italic">No specific authorities assigned to this designation yet.</span>';
+        }
+    }
+</script>
+</th:block>
+
+</body>
+</html>

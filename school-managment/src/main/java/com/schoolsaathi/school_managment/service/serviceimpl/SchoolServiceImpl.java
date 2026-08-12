@@ -45,35 +45,20 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     @Transactional
-    public SchoolResponseDto registerSchool(
-            SchoolRegistrationDto dto) {
-
-        log.info("Registering new school: {}",
-                dto.getName());
-
-        // 1. Email already exists check
-        if (schoolRepository
-                .existsByEmailAndIsDeletedFalse(
-                        dto.getEmail())) {
-            throw new DuplicateEntryException(
-                    "School already exists with email: "
-                            + dto.getEmail());
+    public SchoolResponseDto registerSchool( SchoolRegistrationDto dto) {
+        log.info("Registering new school: {}",dto.getName());
+        if (schoolRepository.existsByEmailAndIsDeletedFalse(dto.getEmail())) {
+            throw new DuplicateEntryException("School already exists with email: "+ dto.getEmail());
         }
-
         // 2. School Code generate karo
         String schoolCode = schoolCodeGenerator.generate();
 
         // 3. School entity banao
         School school = School.builder()
-                .schoolCode(schoolCode)
-                .name(dto.getName())
-                .tagline(dto.getTagline())
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .alternatePhone(dto.getAlternatePhone())
-                .website(dto.getWebsite())
-                .addressLine1(dto.getAddressLine1())
-                .addressLine2(dto.getAddressLine2())
+                .schoolCode(schoolCode).name(dto.getName())
+                .tagline(dto.getTagline()).email(dto.getEmail())
+                .phone(dto.getPhone()).alternatePhone(dto.getAlternatePhone()).website(dto.getWebsite())
+                .addressLine1(dto.getAddressLine1()).addressLine2(dto.getAddressLine2())
                 .city(dto.getCity())
                 .state(dto.getState())
                 .pincode(dto.getPincode())
@@ -87,8 +72,7 @@ public class SchoolServiceImpl implements SchoolService {
                 .subscriptionPlan(SubscriptionPlan.TRIAL)
                 .isTrial(true)
                 .trialStartDate(LocalDate.now())
-                .trialEndDate(
-                        LocalDate.now().plusDays(30))
+                .trialEndDate(LocalDate.now().plusDays(30))
                 .maxStudents(200)
                 .isActive(true)
                 // Default receipt prefix
@@ -104,8 +88,7 @@ public class SchoolServiceImpl implements SchoolService {
         User adminUser = User.builder()
                 .name(dto.getAdminName())
                 .email(dto.getAdminEmail())
-                .password(passwordEncoder.encode(
-                        dto.getAdminPassword()))
+                .password(passwordEncoder.encode(dto.getAdminPassword()))
                 .role(UserRole.SCHOOL_ADMIN)
                 .isActive(true)
                 .build();
@@ -114,20 +97,14 @@ public class SchoolServiceImpl implements SchoolService {
         adminUser.setSchoolId(savedSchool.getId());
         userRepository.save(adminUser);
 
-        log.info("School registered successfully: {} - {}",
-                schoolCode, dto.getName());
+        log.info("School registered successfully: {} - {}",schoolCode, dto.getName());
 
         return mapToResponseDto(savedSchool);
     }
 
-    // ─────────────────────────────────────
-    // Update School
-    // ─────────────────────────────────────
-
     @Override
     @Transactional
-    public SchoolResponseDto updateSchool(
-            UUID schoolId, SchoolUpdateDto dto) {
+    public SchoolResponseDto updateSchool(UUID schoolId, SchoolUpdateDto dto) {
 
         School school = findSchoolById(schoolId);
 

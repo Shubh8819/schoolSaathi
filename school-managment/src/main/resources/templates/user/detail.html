@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title th:text="${user.name} + ' | User Profile'">User Profile</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <!-- Navigation Back -->
+    <div class="mb-3">
+        <a th:href="@{/web/users}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i>Back to Staff & Users Directory
+        </a>
+    </div>
+
+    <!-- Profile Header Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle p-3 px-4 fw-bold display-6">
+                        <span th:text="${user.name != null and !user.name.isEmpty() ? user.name.substring(0,1).toUpperCase() : 'U'}">U</span>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h3 class="fw-bold mb-0 text-dark" th:text="${user.name}">User Name</h3>
+                            <span class="badge bg-secondary-subtle text-dark border" th:text="${user.role}">ROLE</span>
+                            <span th:class="${user.isActive ? 'badge bg-success-subtle text-success border border-success-subtle' : 'badge bg-secondary-subtle text-secondary'}"
+                                  th:text="${user.isActive ? 'Active' : 'Inactive'}">Active</span>
+                        </div>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-envelope me-1"></i><span th:text="${user.email}">email@domain.com</span>
+                            <span th:if="${user.phone != null}" class="ms-3"><i class="bi bi-telephone me-1"></i><span th:text="${user.phone}">Phone</span></span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2" sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN')">
+                    <a th:href="@{/web/users/{id}/edit(id=${user.id})}" class="btn btn-outline-warning text-dark rounded-pill px-3">
+                        <i class="bi bi-pencil me-1"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department, Designation & Rights Grid -->
+    <div class="row g-4">
+        <!-- Employment & Assignment Details -->
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-diagram-3 text-primary me-2"></i>Employment & Department Info
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted">Employee ID:</span>
+                            <span class="fw-bold text-dark" th:text="${user.employeeId != null ? user.employeeId : 'N/A'}">N/A</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted">Department:</span>
+                            <span th:if="${user.departmentName != null}" class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 fs-6" th:text="${user.departmentName}">Department</span>
+                            <span th:if="${user.departmentName == null}" class="text-muted italic">Not Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted">Designation:</span>
+                            <span th:if="${user.designationTitle != null}" class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6" th:text="${user.designationTitle}">Designation</span>
+                            <span th:if="${user.designationTitle == null and user.designation != null}" class="badge bg-light text-dark border px-3 py-2" th:text="${user.designation}">Designation</span>
+                            <span th:if="${user.designationTitle == null and user.designation == null}" class="text-muted italic">Not Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted">Joining Date:</span>
+                            <span class="fw-semibold text-dark" th:text="${user.joiningDate != null ? user.joiningDate : 'N/A'}">N/A</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inherited Action Rights & Authorities -->
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-shield-check text-success me-2"></i>Inherited Rights & Authorities
+                    </h6>
+                    <span class="badge bg-success rounded-pill px-3 py-2" th:text="${user.authorities != null ? user.authorities.size() : 0} + ' Granted Rights'">0 Granted Rights</span>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-3">These action rights are inherited from the assigned <strong>Designation</strong>:</p>
+
+                    <div class="d-flex flex-wrap gap-2" th:if="${user.authorities != null and !user.authorities.isEmpty()}">
+                        <span th:each="auth : ${user.authorities}" class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 fs-6">
+                            <i class="bi bi-check-circle-fill me-2 text-primary"></i>
+                            <span th:text="${auth.displayName}">Authority</span>
+                        </span>
+                    </div>
+
+                    <div th:if="${user.authorities == null or user.authorities.isEmpty()}" class="text-center py-4 text-muted">
+                        <i class="bi bi-shield-exclamation text-warning display-5"></i>
+                        <h6 class="mt-3 fw-bold">No Rights Granted Yet</h6>
+                        <p class="small mb-0">Assign a Designation to this user to automatically grant action rights like Add Teacher, Add Student, Add Fee, Update Fee, etc.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

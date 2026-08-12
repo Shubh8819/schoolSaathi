@@ -56,4 +56,20 @@ public class User extends BaseEntity {
     private Boolean isActive = true;
 
     private LocalDateTime lastLoginAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "designation_id")
+    private Designation designationEntity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_class_id")
+    private ClassRoom assignedClass;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_section_id")
+    private Section assignedSection;
 }

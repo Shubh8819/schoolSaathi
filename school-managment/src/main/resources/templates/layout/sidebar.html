@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <body>
 <nav id="sidebar" th:fragment="sidebar">
@@ -13,32 +14,52 @@
 
     <ul class="list-unstyled components">
 
-        <!-- Dashboard -->
+        <!-- Dashboard — Available to all authenticated users -->
         <li th:classappend="${activePage == 'dashboard'} ? 'active'">
-            <a th:href="@{/web/dashboard}">
-                <i class="bi bi-speedometer2 me-2"></i>
-                Dashboard
-            </a>
+            <a th:href="@{/web/dashboard}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
         </li>
 
         <!-- Schools — Super Admin Only -->
-        <li th:classappend="${activePage == 'schools'} ? 'active'">
+        <li sec:authorize="hasRole('SUPER_ADMIN')" th:classappend="${activePage == 'schools'} ? 'active'">
             <a th:href="@{/web/schools}">
                 <i class="bi bi-building me-2"></i>
                 Schools
             </a>
         </li>
+       <!-- <span th:each="authority : ${#authentication.authorities}"
+              th:text="${authority.authority}">
+        </span>-->
 
-        <!-- Students -->
-        <li th:classappend="${activePage == 'students'} ? 'active'">
+        <!-- Departments & Roles — Admin or MANAGE_DEPARTMENT Authority -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN') or hasAuthority('MANAGE_DEPARTMENT')"
+            th:classappend="${activePage == 'departments'} ? 'active'">
+            <a th:href="@{/web/departments}">
+                <i class="bi bi-diagram-3 me-2"></i>
+                Departments & Roles
+            </a>
+        </li>
+
+        <!-- Staff & Users — Admin or ADD_TEACHER/VIEW_TEACHER Authorities -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN') or hasAnyAuthority('ADD_TEACHER', 'VIEW_TEACHER', 'EDIT_TEACHER')"
+            th:classappend="${activePage == 'users'} ? 'active'">
+            <a th:href="@{/web/users}">
+                <i class="bi bi-person-vcard me-2"></i>
+                Staff & Users
+            </a>
+        </li>
+
+        <!-- Students — Admin or Student Authorities -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN') or hasAnyAuthority('ADD_STUDENT', 'VIEW_STUDENT', 'EDIT_STUDENT')"
+            th:classappend="${activePage == 'students'} ? 'active'">
             <a th:href="@{/web/students}">
                 <i class="bi bi-people me-2"></i>
                 Students
             </a>
         </li>
 
-        <!-- Fees -->
-        <li th:classappend="${activePage == 'fees'} ? 'active'">
+        <!-- Fees — Admin or Fee Authorities -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'ACCOUNTANT') or hasAnyAuthority('ADD_FEE', 'UPDATE_FEE', 'VIEW_FEE')"
+            th:classappend="${activePage == 'fees'} ? 'active'">
             <a data-bs-toggle="collapse"
                href="#feesMenu"
                role="button">
@@ -48,17 +69,17 @@
             </a>
             <div class="collapse" id="feesMenu">
                 <ul class="list-unstyled ps-3">
-                    <li>
+                    <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'ACCOUNTANT') or hasAuthority('UPDATE_FEE')">
                         <a th:href="@{/web/fees/structure}">
                             Fee Structure
                         </a>
                     </li>
-                    <li>
+                    <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'ACCOUNTANT') or hasAuthority('ADD_FEE')">
                         <a th:href="@{/web/fees/collect}">
                             Collect Fee
                         </a>
                     </li>
-                    <li>
+                    <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'ACCOUNTANT') or hasAuthority('VIEW_FEE')">
                         <a th:href="@{/web/fees/outstanding}">
                             Outstanding
                         </a>
@@ -67,8 +88,9 @@
             </div>
         </li>
 
-        <!-- Attendance -->
-        <li th:classappend="${activePage == 'attendance'} ? 'active'">
+        <!-- Attendance — Admin, Teacher, or Attendance Authorities -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'TEACHER') or hasAnyAuthority('MARK_ATTENDANCE', 'VIEW_ATTENDANCE')"
+            th:classappend="${activePage == 'attendance'} ? 'active'">
             <a data-bs-toggle="collapse"
                href="#attendanceMenu"
                role="button">
@@ -78,12 +100,12 @@
             </a>
             <div class="collapse" id="attendanceMenu">
                 <ul class="list-unstyled ps-3">
-                    <li>
+                    <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN', 'TEACHER') or hasAuthority('MARK_ATTENDANCE')">
                         <a th:href="@{/web/attendance/mark}">
                             Mark Attendance
                         </a>
                     </li>
-                    <li>
+                    <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN') or hasAuthority('VIEW_ATTENDANCE')">
                         <a th:href="@{/web/attendance/report}">
                             Report
                         </a>
@@ -100,8 +122,8 @@
             </a>
         </li>
 
-        <!-- Settings -->
-        <li th:classappend="${activePage == 'settings'} ? 'active'">
+        <!-- Settings — Admin Only -->
+        <li sec:authorize="hasAnyRole('SUPER_ADMIN', 'SCHOOL_ADMIN')" th:classappend="${activePage == 'settings'} ? 'active'">
             <a th:href="@{/web/settings}">
                 <i class="bi bi-gear me-2"></i>
                 Settings

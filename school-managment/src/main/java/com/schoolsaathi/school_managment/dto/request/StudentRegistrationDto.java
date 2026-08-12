@@ -28,8 +28,10 @@ public class StudentRegistrationDto {
     private Gender gender;
 
     private String bloodGroup;
+    private String photoUrl;
     private String aadhaarNumber;
-    private String category;          // GENERAL, OBC, SC, ST
+    private String aadhaarCardUrl;
+    private String category;          // GENERAL, OBC, SC, ST, EWS
     private String religion;
     private String house;             // RED, BLUE, GREEN
 
@@ -45,19 +47,27 @@ public class StudentRegistrationDto {
 
     private Integer rollNumber;
 
-    // Contact
+    // Contact / Address
     private String address;
+    private String addressLine2;
     private String city;
+    private String state;
     private String pincode;
+    @Builder.Default
+    private String country = "India";
 
     // Previous School
     private String previousSchool;
     private String admissionType;     // NEW, TRANSFER
+    private String board;
+    private String transferCertificateUrl;
+    private String birthCertificateUrl;
 
     // Medical
     private String medicalCondition;
 
     // Sibling
+    @Builder.Default
     private Boolean hasSibling = false;
     private UUID siblingStudentId;
 

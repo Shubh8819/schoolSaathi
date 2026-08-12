@@ -2,6 +2,7 @@ package com.schoolsaathi.school_managment.entity;
 
 
 import com.schoolsaathi.school_managment.entity.baseentity.BaseEntity;
+import com.schoolsaathi.school_managment.enums.AdmissionCategory;
 import com.schoolsaathi.school_managment.enums.Gender;
 import com.schoolsaathi.school_managment.enums.StudentStatus;
 import jakarta.persistence.*;
@@ -44,6 +45,8 @@ public class Student extends BaseEntity {
 
     private String bloodGroup;
     private String photoUrl;
+    private String religion;
+    private String house;               // RED, BLUE, GREEN
 
     // Academic
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,17 +63,43 @@ public class Student extends BaseEntity {
 
     private Integer rollNumber;
 
-    // Contact
+    // Contact / Address
     private String address;
+    private String addressLine2;
     private String city;
+    private String state;
     private String pincode;
+
+    @Builder.Default
+    private String country = "India";
+
+    // Admission
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private AdmissionCategory category;
+
+    private String board;
+    private String admissionType;       // NEW, TRANSFER
 
     // Previous School
     private String previousSchool;
     private String transferCertificate;
+    private String birthCertificate;
+
+    // Government ID
+    private String aadharNumber;
+    private String aadharCardUrl;
 
     // Medical
     private String medicalCondition;
+
+    // Sibling
+    @Builder.Default
+    private Boolean hasSibling = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sibling_student_id")
+    private Student sibling;
 
     // Status
     @Enumerated(EnumType.STRING)

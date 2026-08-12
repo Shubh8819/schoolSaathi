@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<!--
+  NOTE: Standalone for preview. To integrate into your dashboard layout, wrap
+  <div class="page-content"> in th:fragment="content" and th:replace it into
+  layout.html the same way your Principal Dashboard page does.
+
+  Field source: StudentRegistrationDto. Address fields don't have their own step
+  per your 4-step spec (basic/admission/class/document), so they're grouped under
+  Step 1 (Basic) as "Contact & Address" — move them if you want a 5th step instead.
+  Parent details (dto.parents, @NotEmpty) are NOT in this wizard — flagged in chat.
+-->
+<head>
+    <meta charset="UTF-8">
+    <title>Add Student - SchoolSaathi</title>
+    <style>
+        :root {
+            --primary: #2563eb; --primary-dark: #1d4ed8; --border: #e2e8f0;
+            --bg-light: #f8fafc; --text-dark: #1e293b; --text-muted: #64748b;
+            --error: #dc2626; --success: #16a34a; --step-inactive: #cbd5e1;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-light); margin: 0; color: var(--text-dark); }
+        .page-content { max-width: 820px; margin: 0 auto; padding: 24px 16px 60px; }
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 22px; margin: 0 0 4px; }
+        .page-header p { color: var(--text-muted); margin: 0; font-size: 14px; }
+
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; }
+        .alert-error { background: #fef2f2; color: var(--error); border: 1px solid #fecaca; }
+
+        /* ---- Step indicator ---- */
+        .stepper { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+        .step-item { display: flex; align-items: center; flex: 1; }
+        .step-item:last-child { flex: 0; }
+        .step-circle {
+            width: 34px; height: 34px; border-radius: 50%; background: #fff;
+            border: 2px solid var(--step-inactive); color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; flex-shrink: 0; transition: all .2s;
+        }
+        .step-label { margin-left: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+        .step-line { flex: 1; height: 2px; background: var(--step-inactive); margin: 0 12px; transition: background .2s; }
+        .step-item.active .step-circle { border-color: var(--primary); background: var(--primary); color: #fff; }
+        .step-item.active .step-label { color: var(--text-dark); }
+        .step-item.done .step-circle { border-color: var(--success); background: var(--success); color: #fff; }
+        .step-item.done .step-line, .step-item.active ~ .step-item .step-line { }
+        .step-item.done + .step-line-wrap .step-line, .line-done { background: var(--success) !important; }
+
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 26px; margin-bottom: 20px; }
+        .card h2 { font-size: 16px; margin: 0 0 4px; color: var(--primary-dark); }
+        .card .sub { font-size: 13px; color: var(--text-muted); margin: 0 0 18px; }
+
+        .form-step { display: none; }
+        .form-step.active { display: block; }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 640px) { .grid, .grid-3 { grid-template-columns: 1fr; } .step-label { display: none; } }
+
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field.full { grid-column: 1 / -1; }
+        label { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        label .required { color: var(--error); }
+        input[type=text], input[type=date], input[type=email], input[type=tel],
+        input[type=number], input[type=file], select {
+            padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 14px; width: 100%; background: #fff;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        .field-error { color: var(--error); font-size: 12px; }
+        .checkbox-row { display: flex; align-items: center; gap: 8px; }
+        .checkbox-row input { width: auto; }
+
+        .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; }
+        .actions-right { display: flex; gap: 12px; margin-left: auto; }
+        .btn { padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #fff; color: var(--text-dark); border: 1px solid var(--border); }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="page-header">
+        <h1>Add Student</h1>
+        <p>Fill in the student's details across the four steps below.</p>
+    </div>
+
+    <div th:if="${#fields.hasErrors('${studentRegistrationDto.*}')}" class="alert alert-error">
+        Please fix the highlighted fields before submitting.
+    </div>
+
+    <!-- ===================== Step indicator ===================== -->
+    <div class="stepper" id="stepper">
+        <div class="step-item active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Basic</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Admission</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Class</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Parents</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" data-step="5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Document</div>
+        </div>
+    </div>
+
+    <form th:action="@{web/students/add}" th:object="${studentRegistrationDto}" method="post" enctype="multipart/form-data" id="studentForm">
+
+        <!-- ===================== Step 1: Basic ===================== -->
+        <div class="form-step active" data-step="1">
+            <div class="card">
+                <h2>Basic Details</h2>
+                <p class="sub">Student's personal information and contact address.</p>
+                <div class="grid">
+                    <div class="field">
+                        <label>Full Name <span class="required">*</span></label>
+                        <label>
+                            <input type="text" th:field="*{name}" placeholder="e.g. Aarav Shah" required />
+                        </label>
+                        <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Date of Birth</label>
+                        <label>
+                            <input type="date" th:field="*{dob}" />
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <label>Gender <span class="required">*</span></label>
+                        <label>
+                            <select th:field="*{gender}" required>
+                                <option value="">Select gender</option>
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </label>
+                        <span class="field-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Blood Group</label>
+                        <label>
+                            <input type="text" th:field="*{bloodGroup}" placeholder="e.g. B+" />
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <label>Religion</label>
+                        <label>
+                            <input type="text" th:field="*{religion}" />
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>House</label>
+                        <label>
+                            <select th:field="*{house}">
+                                <option value="">Select house</option>
+                                <option value="RED">Red</option>
+                                <option value="BLUE">Blue</option>
+                                <option value="GREEN">Green</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="field full">
+                        <label>Medical Condition (if any)</label>
+                        <label>
+                            <input type="text" th:field="*{medicalCondition}" placeholder="e.g. Asthma, none" />
+                        </label>
+                    </div>
+
+                    <div class="field full">
+                        <label>Address Line 1</label>
+                        <label>
+                            <input type="text" th:field="*{address}" />
+                        </label>
+                    </div>
+                    <div class="field full">
+                        <label>Address Line 2</label>
+                        <label>
+                            <input type="text" th:field="*{addressLine2}" />
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <label>City</label>
+                        <label>
+                            <input type="text" th:field="*{city}" />
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>State</label>
+                        <label>
+                            <input type="text" th:field="*{state}" />
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Pincode</label>
+                        <input type="text" th:field="*{pincode}" placeholder="6-digit" />
+                    </div>
+                    <div class="field">
+                        <label>Country</label>
+                        <input type="text" th:field="*{country}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== Step 2: Admission ===================== -->
+        <div class="form-step" data-step="2">
+            <div class="card">
+                <h2>Admission Details</h2>
+                <p class="sub">Leave admission number blank to auto-generate.</p>
+                <div class="grid">
+                    <div class="field">
+                        <label>Admission Number</label>
+                        <input type="text" th:field="*{admissionNumber}" placeholder="Auto-generated if blank" />
+                        <span class="field-error" th:if="${#fields.hasErrors('admissionNumber')}" th:errors="*{admissionNumber}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Admission Date</label>
+                        <input type="date" th:field="*{admissionDate}" />
+                    </div>
+
+                    <div class="field">
+                        <label>Admission Type</label>
+                        <select th:field="*{admissionType}">
+                            <option value="">Select type</option>
+                            <option value="NEW">New</option>
+                            <option value="TRANSFER">Transfer</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Category</label>
+                        <select th:field="*{category}">
+                            <option value="">Select category</option>
+                            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"></option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Board</label>
+                        <input type="text" th:field="*{board}" placeholder="e.g. CBSE" />
+                    </div>
+                    <div class="field">
+                        <label>Previous School (if any)</label>
+                        <input type="text" th:field="*{previousSchool}" />
+                    </div>
+
+                    <div class="field full">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="hasSibling" th:field="*{hasSibling}" />
+                            <label for="hasSibling" style="margin:0;">Has a sibling already enrolled?</label>
+                        </div>
+                    </div>
+                    <div class="field full" id="siblingIdField">
+                        <label>Sibling's Admission Number / ID</label>
+                        <input type="text" th:field="*{siblingStudentId}" placeholder="Existing student's ID" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== Step 3: Class ===================== -->
+        <div class="form-step" data-step="3">
+            <div class="card">
+                <h2>Class Details</h2>
+                <p class="sub">Assign the student's class, section, and academic year.</p>
+                <div class="grid">
+                    <div class="field">
+                        <label>Class <span class="required">*</span></label>
+                        <select th:field="*{classId}" required>
+                            <option value="">Select class</option>
+                            <option th:each="c : ${classRooms}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('classId')}" th:errors="*{classId}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Section <span class="required">*</span></label>
+                        <select th:field="*{sectionId}" required>
+                            <option value="">Select section</option>
+                            <option th:each="s : ${sections}" th:value="${s.id}" th:text="${s.name}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('sectionId')}" th:errors="*{sectionId}"></span>
+                    </div>
+
+                    <div class="field">
+                        <label>Academic Year <span class="required">*</span></label>
+                        <select th:field="*{academicYearId}" required>
+                            <option value="">Select academic year</option>
+                            <option th:each="y : ${academicYears}" th:value="${y.id}" th:text="${y.name}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('academicYearId')}" th:errors="*{academicYearId}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Roll Number</label>
+                        <input type="number" th:field="*{rollNumber}" min="1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== Step 4: Document ===================== -->
+        <div class="form-step" data-step="4">
+            <div class="card">
+                <h2>Documents</h2>
+                <p class="sub">Upload photo and supporting documents.</p>
+                <div class="grid-3">
+                    <div class="field">
+                        <label>Student Photo</label>
+                        <input type="file" name="photo" accept="image/*" />
+                    </div>
+                    <div class="field">
+                        <label>Birth Certificate</label>
+                        <input type="file" name="birthCertificate" accept=".pdf,image/*" />
+                    </div>
+                    <div class="field">
+                        <label>Transfer Certificate</label>
+                        <input type="file" name="transferCertificate" accept=".pdf,image/*" />
+                    </div>
+                    <div class="field">
+                        <label>Aadhaar Number</label>
+                        <input type="text" th:field="*{aadhaarNumber}" placeholder="12-digit" />
+                        <span class="field-error" th:if="${#fields.hasErrors('aadhaarNumber')}" th:errors="*{aadhaarNumber}"></span>
+                    </div>
+                    <div class="field">
+                        <label>Aadhaar Card Upload</label>
+                        <input type="file" name="aadhaarCard" accept=".pdf,image/*" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== Navigation ===================== -->
+        <div class="actions">
+            <a th:href="@{/students}" class="btn btn-secondary">Cancel</a>
+            <div class="actions-right">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)" style="display:none;">Previous</button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">Save Student</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function showStep(step) {
+        document.querySelectorAll('.form-step').forEach(el => {
+            el.classList.toggle('active', Number(el.dataset.step) === step);
+        });
+        document.querySelectorAll('.step-item').forEach(el => {
+            const s = Number(el.dataset.step);
+            el.classList.toggle('active', s === step);
+            el.classList.toggle('done', s < step);
+        });
+        document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-block';
+        document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-block';
+        document.getElementById('submitBtn').style.display = step === totalSteps ? 'inline-block' : 'none';
+    }
+
+    function currentStepIsValid() {
+        const stepEl = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+        const inputs = stepEl.querySelectorAll('input, select');
+        for (const input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function changeStep(direction) {
+        if (direction === 1 && !currentStepIsValid()) return;
+        const next = currentStep + direction;
+        if (next < 1 || next > totalSteps) return;
+        currentStep = next;
+        showStep(currentStep);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSiblingField() {
+        const checked = document.getElementById('hasSibling').checked;
+        document.getElementById('siblingIdField').style.display = checked ? 'flex' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showStep(currentStep);
+        toggleSiblingField();
+        document.getElementById('hasSibling').addEventListener('change', toggleSiblingField);
+    });
+</script>
+</body>
+</html>

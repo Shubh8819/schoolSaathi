@@ -20,8 +20,7 @@ import java.util.List;
 public class School extends BaseEntity {
 
     // Identity
-    @Column(name = "school_code",
-            unique = true, nullable = false)
+    @Column(name = "school_code",unique = true, nullable = false)
     private String schoolCode;
 
     @Column(nullable = false)
@@ -110,15 +109,12 @@ public class School extends BaseEntity {
     private Boolean isTrial = true;
 
     // Relationships
-    @OneToMany(mappedBy = "school",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school",cascade = CascadeType.ALL)
     private List<User> users;
 
-    @OneToMany(mappedBy = "school",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school",cascade = CascadeType.ALL)
     private List<AcademicYear> academicYears;
 
-    @OneToMany(mappedBy = "school",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school" ,cascade = CascadeType.ALL)
     private List<ClassRoom> classRooms;
 }
