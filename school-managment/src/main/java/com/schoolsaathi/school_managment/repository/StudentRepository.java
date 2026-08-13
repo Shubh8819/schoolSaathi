@@ -24,8 +24,8 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     Page<Student> findAllBySchoolIdAndIsDeletedFalse(UUID schoolId, Pageable pageable);
 
-    List<Student> findAllBySchoolIdAndClassRoomIdAndSectionIdAndIsDeletedFalse(
-            UUID schoolId, UUID classRoomId, UUID sectionId);
+    List<Student> findAllBySchoolIdAndClassRoomIdAndIsDeletedFalse(
+            UUID schoolId, UUID classRoomId);
 
     Page<Student> findAllBySchoolIdAndStatusAndIsDeletedFalse(UUID schoolId, StudentStatus status, Pageable pageable);
 
@@ -41,4 +41,6 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
                                     Pageable pageable);
 
     long countBySchoolIdAndIsDeletedFalse(UUID schoolId);
+
+
 }

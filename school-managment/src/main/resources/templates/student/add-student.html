@@ -303,10 +303,12 @@
 
                     <div class="field">
                         <label>Academic Year <span class="required">*</span></label>
-                        <select th:field="*{academicYearId}" required>
-                            <option value="">Select academic year</option>
-                            <option th:each="y : ${academicYears}" th:value="${y.id}" th:text="${y.name}"></option>
-                        </select>
+                        <label>
+                            <select th:field="*{academicYearId}" required>
+                                <option value="">Select academic year</option>
+                                <option th:each="y : ${academicYears}" th:value="${y.id}" th:text="${y.name}"></option>
+                            </select>
+                        </label>
                         <span class="field-error" th:if="${#fields.hasErrors('academicYearId')}" th:errors="*{academicYearId}"></span>
                     </div>
                     <div class="field">

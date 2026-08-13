@@ -38,7 +38,6 @@ public class StudentMapper {
                 .aadharCardUrl(dto.getAadhaarCardUrl())
                 .category(parseCategory(dto.getCategory()))
                 .classRoom(classRoom)
-                .section(section)
                 .academicYear(academicYear)
                 .rollNumber(dto.getRollNumber())
                 .address(dto.getAddress())
@@ -74,7 +73,8 @@ public class StudentMapper {
         student.setAadharCardUrl(dto.getAadhaarCardUrl());
         student.setCategory(parseCategory(dto.getCategory()));
         student.setClassRoom(classRoom);
-        student.setSection(section);
+
+
         student.setAcademicYear(academicYear);
         student.setRollNumber(dto.getRollNumber());
         student.setAddress(dto.getAddress());

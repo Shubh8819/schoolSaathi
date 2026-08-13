@@ -26,9 +26,7 @@ import java.util.List;
 public class Student extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id",insertable = false,updatable = false)
     private School school;
 
     // Identity
@@ -53,9 +51,7 @@ public class Student extends BaseEntity {
     @JoinColumn(name = "class_id")
     private ClassRoom classRoom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_id")
-    private Section section;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id")
@@ -111,15 +107,12 @@ public class Student extends BaseEntity {
     private String leavingReason;
 
     // Relationships
-    @OneToMany(mappedBy = "student",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<Parent> parents;
 
-    @OneToMany(mappedBy = "student",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<FeeCollection> feeCollections;
 
-    @OneToMany(mappedBy = "student",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<Attendance> attendances;
 }

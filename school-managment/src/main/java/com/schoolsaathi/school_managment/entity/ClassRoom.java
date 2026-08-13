@@ -19,14 +19,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class ClassRoom extends BaseEntity {
 
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id",insertable = false,updatable = false)
     private School school;
 
     @Column(nullable = false)
@@ -37,11 +36,13 @@ public class ClassRoom extends BaseEntity {
     private String description;
 
     // Relationships
-    @OneToMany(mappedBy = "classRoom",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "classRoom",cascade = CascadeType.ALL)
     private List<Section> sections;
 
-    @OneToMany(mappedBy = "classRoom",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "classRoom",cascade = CascadeType.ALL)
     private List<Student> students;
+
+    @OneToOne
+    @JoinColumn(name = "fee_template_id")
+    private FeeTemplate feeTemplate;
 }

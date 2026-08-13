@@ -18,7 +18,8 @@ import java.time.LocalDate;
                 @UniqueConstraint(
                         columnNames = {
                                 "school_id", "academic_year_id",
-                                "class_id", "fee_head"
+                                "class_id", "fee_head",
+
                         }
                 )
         })
@@ -30,18 +31,26 @@ import java.time.LocalDate;
 public class FeeStructure extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id",insertable = false,updatable = false)
     private School school;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id")
     private AcademicYear academicYear;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id", nullable = false)
     private ClassRoom classRoom;
+
+    @ManyToOne
+    @JoinColumn(name = "template_id")
+    private FeeTemplate template;
+
+
+
+
+
 
     // Fee Details
     @Column(name = "fee_head", nullable = false)
@@ -62,4 +71,18 @@ public class FeeStructure extends BaseEntity {
     private Boolean isOptional = false;
 
     private String description;
+
+    @Override
+    public String toString() {
+        return "FeeStructure{" +
+                "academicYear "+ academicYear +
+                "feeHead='" + feeHead + '\'' +
+                ", amount=" + amount +
+                ", frequency=" + frequency +
+                ", dueDate=" + dueDate +
+                ", dueDayOfMonth=" + dueDayOfMonth +
+                ", isOptional=" + isOptional +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

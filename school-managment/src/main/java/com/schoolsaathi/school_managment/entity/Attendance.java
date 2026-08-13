@@ -25,9 +25,7 @@ import java.time.LocalDateTime;
 public class Attendance extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id", insertable = false,updatable = false)
     private School school;
 
     @ManyToOne(fetch = FetchType.LAZY)

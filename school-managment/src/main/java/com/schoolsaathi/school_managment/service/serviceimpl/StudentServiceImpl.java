@@ -50,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
                     "Admission number '" + dto.getAdmissionNumber() + "' already exists for this school");
         }
 
-        ClassRoom classRoom = classRoomRepository.findByIdAndSchoolIdAndIsDeletedFalse(dto.getClassId(), schoolId)
+        ClassRoom classRoom = classRoomRepository.findByIdAndSchoolIdAndIsDeletedFalse(dto.getClassId(),schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
         Section section = sectionRepository.findByIdAndSchoolIdAndIsDeletedFalse(dto.getSectionId(), schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found"));
@@ -141,7 +141,7 @@ public class StudentServiceImpl implements StudentService {
                 .admissionNumber(s.getAdmissionNumber())
                 .name(s.getName())
                 .className(s.getClassRoom() != null ? s.getClassRoom().getName() : null)
-                .sectionName(s.getSection() != null ? s.getSection().getName() : null)
+                //.sectionName(s.getSection() != null ? s.getSection().getName() : null)
                 .rollNumber(s.getRollNumber())
                 .photoUrl(s.getPhotoUrl())
                 .status(s.getStatus())

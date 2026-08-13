@@ -41,7 +41,6 @@ public class AcademicYear extends BaseEntity {
     private Boolean isCurrent = false;
 
     // Relationships
-    @OneToMany(mappedBy = "academicYear",
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "academicYear",cascade = CascadeType.ALL)
     private List<FeeStructure> feeStructures;
 }

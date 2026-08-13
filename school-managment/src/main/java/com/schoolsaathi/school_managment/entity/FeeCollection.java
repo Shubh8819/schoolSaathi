@@ -24,9 +24,7 @@ import java.time.LocalDate;
 public class FeeCollection extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id",insertable = false,updatable = false)
     private School school;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,22 +40,16 @@ public class FeeCollection extends BaseEntity {
     private AcademicYear academicYear;
 
     // Payment Details
-    @Column(name = "amount_paid",
-            nullable = false,
-            precision = 10, scale = 2)
+    @Column(name = "amount_paid",nullable = false,precision = 10, scale = 2)
     private BigDecimal amountPaid;
 
-    @Column(name = "discount_amount",
-            precision = 10, scale = 2)
+    @Column(name = "discount_amount",precision = 10, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @Column(name = "fine_amount",
-            precision = 10, scale = 2)
+    @Column(name = "fine_amount",precision = 10, scale = 2)
     private BigDecimal fineAmount = BigDecimal.ZERO;
 
-    @Column(name = "total_amount",
-            nullable = false,
-            precision = 10, scale = 2)
+    @Column(name = "total_amount",nullable = false,precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(name = "payment_date", nullable = false)

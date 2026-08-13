@@ -2,6 +2,7 @@ package com.schoolsaathi.school_managment.entity;
 
 
 import com.schoolsaathi.school_managment.entity.baseentity.BaseEntity;
+import com.schoolsaathi.school_managment.enums.ClassSection;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,20 +20,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Section extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id",
-            insertable = false,
-            updatable = false)
+    @JoinColumn(name = "school_id",insertable = false,updatable = false)
     private School school;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_id")
     private ClassRoom classRoom;
 
+
     @Column(nullable = false)
-    private String name;        // A, B, C
+    private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_teacher_id")
@@ -40,8 +41,12 @@ public class Section extends BaseEntity {
 
     private Integer capacity;
 
-    // Relationships
-    @OneToMany(mappedBy = "section",
-            cascade = CascadeType.ALL)
-    private List<Student> students;
+    @Override
+    public String toString() {
+        return "Section{" +
+                "name='" + name + '\'' +
+                ", classTeacher=" + classTeacher +
+                ", capacity=" + capacity +
+                '}';
+    }
 }

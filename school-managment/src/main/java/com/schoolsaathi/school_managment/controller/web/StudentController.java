@@ -124,16 +124,13 @@ public class StudentController {
         model.addAttribute("genders", Gender.values());
         model.addAttribute("categories", AdmissionCategory.values());
         // TODO: confirm these repository method names match your ClassRoom/Section/AcademicYear repos
-        List<ClassRoom> classes= (List<ClassRoom>) classRoomRepository.findAllBySchoolIdAndIsDeletedFalse(schoolId).get();
-        UUID classId = UUID.fromString(
-                "009e7f7c-73a6-4e28-a00f-20eb8dc5326b"
-        );
-        List<Section> sections= (List<Section>) sectionRepository.findBySchoolIdAndClassRoomIdAndIsDeletedFalse(schoolId,classId).get();
+        List<ClassRoom> classes=  classRoomRepository.findBySchoolId(schoolId);
         List<AcademicYear> academicYears=academicYearRepository.findAllBySchoolIdAndIsDeletedFalse(schoolId).get();
+        System.out.println("classes============"+classes);
 
         model.addAttribute("classRooms", classes);
-        model.addAttribute("sections", sections);
-        model.addAttribute("academicYears", academicYears);
+
+       // model.addAttribute("academicYears", academicYears);
     }
 
     // ---- TODO: wire these to your actual CustomUserDetails principal ----
